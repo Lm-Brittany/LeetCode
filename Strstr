@@ -1,0 +1,61 @@
+给你两个字符串 haystack 和 needle ，请你在 haystack 字符串中找出 needle 字符串出现的第一个位置（下标从 0 开始）。如果不存在，则返回  -1 。
+
+思路：kmp算法
+
+代码：
+class Solution {
+public:
+    int strStr(string haystack, string needle) {
+        //字符串匹配
+        if(needle.size() == 0){
+            return 0;
+        }
+        // int i,len = needle.size();
+        // for(i = 0; i <= haystack.size()-len; i++){
+        //     if(haystack.substr(i,i+len) == needle){
+        //         return i;
+        //     }
+        // }
+        // if(i > haystack.size()-len){
+        //     return -1;
+        // }
+
+        //KMP算法
+        //预处理，根据模式串生成next数组
+        vector<int> next = getNext(needle);
+        int j = 0; //j：最长可匹配前缀子串的下一个位置
+        //主循环，遍历主串字符
+        for (int i = 0; i < haystack.size(); i++) {
+            while (j > 0 && haystack[i] != needle[j]) {
+                //遇到坏字符时，查询next数组并改变模式串的起点
+                j = next[j];
+            }
+            if (haystack[i] == needle[j]) {
+                j++;
+            }
+            if (j == needle.size()) {
+                //匹配成功，返回下标
+                return i - needle.size() + 1;
+            }
+        }
+        return -1;
+    }
+
+    vector<int> getNext(string needle) {
+        vector<int> next;
+        next.resize(needle.size());
+        int j = 0;
+        //next[0] = next[1] = 0
+        for (int i = 2; i < needle.size(); i++) {
+            while (j != 0 && needle[j] != needle[i - 1]) {
+                //回溯求解
+                j = next[j];
+            }
+            if (needle[j] == needle[i - 1]) {
+                j++;
+            }
+            next[i] = j;
+        }
+        return next;
+    }
+};
